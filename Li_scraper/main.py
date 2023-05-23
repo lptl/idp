@@ -7,6 +7,7 @@ import re as re
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -38,7 +39,11 @@ except:
     f.write("username={}, password={}".format(username,password))
     f.close()
 
-browser = webdriver.Chrome('chromedriver')
+chrome_options = Options()
+#chrome_options.add_experimental_option("detach", True)
+
+browser = webdriver.Chrome(options=chrome_options)
+
 #Open login page
 browser.get('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
 
@@ -55,78 +60,78 @@ browser.get('https://www.linkedin.com/in/dmoskov'+'/detail/recent-activity/share
 link_activity = (page + '/recent-activity/all/')
 
 browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+time.sleep(3)
+# delay = 3 # seconds
+# try:
+#     myElem = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.ID, 'ember501')))
+#     print ("Page is ready!")
+# except TimeoutException:
+#     print ("Loading took too much time!")
 
-delay = 3 # seconds
-try:
-    myElem = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.ID, 'ember501')))
-    print ("Page is ready!")
-except TimeoutException:
-    print ("Loading took too much time!")
-
-show_activity_button = browser.find_element("xpath","//button[contains(., 'Show all activity')]")
+#show_activity_button = browser.find_element("xpath","//button[contains(., 'Show all activity')]")
 
 #show_activity_button.click()
 
 # b = browser.find_element('xpath','//*[@id="ember157"]/footer/a/span')
 # b.click()
 
-# print(link_activity)
-# SCROLL_PAUSE_TIME = 1.5
-#
-# # Get scroll height
-# last_height = browser.execute_script("return document.documentElement.scrollHeight")
-#
-# while True:
-#     # Scroll down to bottom
-#     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#
-#     # Wait to load page
-#     time.sleep(SCROLL_PAUSE_TIME)
-#
-#     # Calculate new scroll height and compare with last scroll height
-#     new_height = browser.execute_script("return document.body.scrollHeight")
-#     if new_height == last_height:
-#         break
-#     last_height = new_height
-#
-#
-# person_page = browser.page_source
-#
-#
-# #Use Beautiful Soup to get access tags
-# linkedin_soup = bs(company_page.encode("utf-8"), "html")
-# linkedin_soup.prettify()
-#
-# #Find the post blocks
-# containers = linkedin_soup.findAll("div",{"class":"occludable-update ember-view"})
-#
-# #containers = linkedin_soup.findAll("div",{"class":"update-components-text relative feed-shared-update-v2__commentary"})
-#
-# post_texts = []
-#
-#
-# for container in containers:
-#     try:
-#         posted_date = container.find("span", {"class": "visually-hidden"})
-#         text_box = container.find("div", {"class": "feed-shared-update-v2__description-wrapper ember-view"})
-#         text = text_box.find("span", {"dir": "ltr"})
-#         new_likes = container.findAll("li", {
-#             "class": "social-details-social-counts__reactions social-details-social-counts__item"})
-#         new_comments = container.findAll("li", {
-#             "class": "social-details-social-counts__comments social-details-social-counts__item"})
-#
-#         # Appending date and text to lists
-#         post_dates.append(posted_date.text.strip())
-#         post_texts.append(text_box.text.strip())
-#     except:
-#         pass
-#
-#
-# data_exp = []
-# #print("output"+data_exp[0])
-#
-#
-# data_exp.append(post_texts)
+print(link_activity)
+SCROLL_PAUSE_TIME = 0.5
+
+# Get scroll height
+screen_height = browser.execute_script("return window.screen.height;")   # get the screen height of the web
+i = 1
+
+while True:
+    # Scroll down to bottom
+    browser.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))
+    i += 1
+    # Wait to load page
+    time.sleep(SCROLL_PAUSE_TIME)
+
+    # Calculate new scroll height and compare with last scroll height
+    new_height = browser.execute_script("return document.body.scrollHeight")
+    if (screen_height) * i > new_height:
+        break
+
+
+person_page = browser.page_source
+
+
+#Use Beautiful Soup to get access tags
+linkedin_soup = bs(person_page, 'lxml')
+linkedin_soup.prettify("utf-8")
+with open("output1.html","w", encoding= 'utf-8') as file:
+    file.write(str(linkedin_soup))
+#Find the post blocks
+#containers = linkedin_soup.findAll("div",{"class":"occludable-update ember-view"})
+
+containers = linkedin_soup.find_all('div', class_='relative')
+print(containers)
+post_texts = []
+
+#ember859 > div > div.feed-shared-update-v2__description-wrapper > div > div
+for container in containers:
+    try:
+        #posted_date = container.find("span", {"class": "visually-hidden"})
+        text_box = container.find('div', attrs= {'class':"update-components-text relative feed-shared-update-v2__commentary", 'dir':"ltr"})
+        text = text_box.find('span',attrs= {'dir': 'ltr'})
+
+        # Appending date and text to lists
+        if text != 'None' :
+            no_span = text[16:-7]
+            post_texts.append(no_span)
+        print('loop')
+    except:
+        pass
+
+
+print(post_texts)
+data_exp = []
+#print("output"+data_exp[0])
+
+
+data_exp.append(post_texts)
 
 
 
