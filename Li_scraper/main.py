@@ -1,137 +1,110 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from bs4 import BeautifulSoup as bs
 import time
 import pandas as pd
-import re as re
+import re
+from typing import Tuple
+from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-df = pd.read_csv('C:/Users/fatih/PycharmProjects/Li_scraper/Crunchbase data/founders_dataset_IDP.csv',usecols=['first_name','last_name','linkedin_url'])
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def get_credentials() -> Tuple[str, str]:
+    try: 
+        credential_file = open('linkedin_credentials.txt', 'r',
+                               encoding='utf-8')
+        contents = credential_file.read()
+        username = contents.replace('=', ',').split(',')[1]
+        password = contents.replace('=', ',').split(',')[3]
+        return username, password
+    except Exception: 
+        username = input('Enter your linkedin username: ')
+        password = input('Enter your linkedin password: ')
+        credential_file = open('linkedin_credentials.txt', 'w+', 
+                               encoding='utf-8')
+        credential_file.write(f'username={username}, password={password}')
+        credential_file.close()
+        return username, password
+    
+def get_chrome_driver() -> webdriver.Chrome:
+    options = webdriver.ChromeOptions()
+    options.binary_location = '/Applications/Chromium.app/Contents/MacOS/Chromium'
+    chrome_driver_binary = '/usr/local/bin/chromedriver'
+    browser = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+    return browser
 
-print(df.iloc[0]["linkedin_url"])
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def login_to_linkedin(browser: webdriver.Chrome, username: str, password: str) -> None:
+    browser.get('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
+    elementID = browser.find_element('id','username')
+    elementID.send_keys(username)
+    elementID = browser.find_element('id','password')
+    elementID.send_keys(password)
+    elementID.submit()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
-
-page = df.iloc[0]["linkedin_url"]
-print(page)
-try:
-    f= open("linkedin_credentials.txt","r")
-    contents = f.read()
-    username = contents.replace("=",",").split(",")[1]
-    password = contents.replace("=",",").split(",")[3]
-except:
-    f= open("linkedin_credentials.txt","w+")
-    username = input('Enter your linkedin username: ')
-    password = input('Enter your linkedin password: ')
-    f.write("username={}, password={}".format(username,password))
-    f.close()
-
-chrome_options = Options()
-#chrome_options.add_experimental_option("detach", True)
-
-browser = webdriver.Chrome(options=chrome_options)
-
-#Open login page
-browser.get('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
-
-#Enter login info:
-elementID = browser.find_element("id","username")
-elementID.send_keys(username)
-
-elementID = browser.find_element("id","password")
-elementID.send_keys(password)
-elementID.submit()
-
-#browser.get(page + 'recent-activity/all/')
-browser.get('https://www.linkedin.com/in/dmoskov'+'/detail/recent-activity/shares/')
-link_activity = (page + '/recent-activity/all/')
-
-browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-time.sleep(3)
-# delay = 3 # seconds
-# try:
-#     myElem = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.ID, 'ember501')))
-#     print ("Page is ready!")
-# except TimeoutException:
-#     print ("Loading took too much time!")
-
-#show_activity_button = browser.find_element("xpath","//button[contains(., 'Show all activity')]")
-
-#show_activity_button.click()
-
-# b = browser.find_element('xpath','//*[@id="ember157"]/footer/a/span')
-# b.click()
-
-print(link_activity)
-SCROLL_PAUSE_TIME = 0.5
-
-# Get scroll height
-screen_height = browser.execute_script("return window.screen.height;")   # get the screen height of the web
-i = 1
-
-while True:
+def scroll_to_the_bottom(browser: webdriver.Chrome):
+    browser.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+    time.sleep(3)  
+    screen_height = browser.execute_script('return window.screen.height;')   # get the screen height of the web
+    i = 1
+    while True:
     # Scroll down to bottom
-    browser.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))
-    i += 1
-    # Wait to load page
-    time.sleep(SCROLL_PAUSE_TIME)
+        browser.execute_script('window.scrollTo(0, {screen_height}*{i});'.format(screen_height=screen_height, i=i))
+        i += 1
+        # Wait to load page
+        time.sleep(SCROLL_PAUSE_TIME)
 
-    # Calculate new scroll height and compare with last scroll height
-    new_height = browser.execute_script("return document.body.scrollHeight")
-    if (screen_height) * i > new_height:
-        break
+        # Calculate new scroll height and compare with last scroll height
+        new_height = browser.execute_script('return document.body.scrollHeight')
+        if (screen_height) * i > new_height:
+            break
 
+def get_post_text(linkedin_soup: bs) -> str:
+    containers = linkedin_soup.find_all('div', class_='relative')
+    post_texts = []
+    # ember859 > div > div.feed-shared-update-v2__description-wrapper > div > div
+    for container in containers:
+        try:
+            # posted_date = container.find('span', {'class': 'visually-hidden'})
+            text_box = container.find('div', attrs={'class':
+                                                    'update-components-text relative feed-shared-update-v2__commentary',
+                                                    'dir':'ltr'})
+            text = text_box.find('span', attrs={'dir': 'ltr'})
 
-person_page = browser.page_source
-
-
-#Use Beautiful Soup to get access tags
-linkedin_soup = bs(person_page, 'lxml')
-linkedin_soup.prettify("utf-8")
-with open("output1.html","w", encoding= 'utf-8') as file:
-    file.write(str(linkedin_soup))
-#Find the post blocks
-#containers = linkedin_soup.findAll("div",{"class":"occludable-update ember-view"})
-
-containers = linkedin_soup.find_all('div', class_='relative')
-print(containers)
-post_texts = []
-
-#ember859 > div > div.feed-shared-update-v2__description-wrapper > div > div
-for container in containers:
-    try:
-        #posted_date = container.find("span", {"class": "visually-hidden"})
-        text_box = container.find('div', attrs= {'class':"update-components-text relative feed-shared-update-v2__commentary", 'dir':"ltr"})
-        text = text_box.find('span',attrs= {'dir': 'ltr'})
-
-        # Appending date and text to lists
-        if text != 'None' :
-            no_span = text[16:-7]
-            post_texts.append(no_span)
-        print('loop')
-    except:
-        pass
+            # Appending date and text to lists
+            if text != 'None' :
+                no_span = text[16:-7]
+                post_texts.append(no_span)
+        except Exceptionxs:
+            pass
+    return post_texts
 
 
-print(post_texts)
-data_exp = []
-#print("output"+data_exp[0])
+if __name__ == '__main__':
+    csv_file_path = '/Users/k/Desktop/Courses/idp/founders_dataset_IDP.csv'
+    SCROLL_PAUSE_TIME = 0.5
 
-
-data_exp.append(post_texts)
+    csv_file_content = pd.read_csv(csv_file_path, usecols=['first_name', 'last_name', 'linkedin_url'])
+    filter_columns = ['person_name', 'linkedin_url']
+    content = csv_file_content[filter_columns]
+    username, password = get_credentials()
+    browser = get_chrome_driver()
+    login_to_linkedin(browser, username, password)
+    for index, row in content.iterrows():
+        url = row['linkedin_url'] + '/detail/recent-activity/shares/'
+        browser.get(url)
+        scroll_to_the_bottom(browser)
+        person_page = browser.page_source
+        person_name = row['person_name']
+        linkedin_soup = bs(person_page, 'lxml')
+        linkedin_soup.prettify('utf-8')
+        with open(f'{person_name}.html', 'w', encoding='utf-8') as file:
+            file.write(str(linkedin_soup))
+        post_texts = get_post_text(linkedin_soup)
+        # print(post_texts)
+        # print('output'+data_exp[0])
+        
 
 
 
