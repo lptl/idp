@@ -1,6 +1,6 @@
+import sys
 import time
 import pandas as pd
-import re
 from typing import Tuple
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
@@ -33,7 +33,7 @@ def get_chrome_driver() -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
     options.binary_location = '/Applications/Chromium.app/Contents/MacOS/Chromium'
     chrome_driver_binary = '/usr/local/bin/chromedriver'
-    browser = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+    browser = webdriver.Chrome(chrome_driver_binary, options=options)
     return browser
 
 
@@ -52,7 +52,6 @@ def scroll_to_the_bottom(browser: webdriver.Chrome):
     screen_height = browser.execute_script('return window.screen.height;')   # get the screen height of the web
     i = 1
     while True:
-    # Scroll down to bottom
         browser.execute_script('window.scrollTo(0, {screen_height}*{i});'.format(screen_height=screen_height, i=i))
         i += 1
         # Wait to load page
@@ -67,21 +66,21 @@ def scroll_to_the_bottom(browser: webdriver.Chrome):
 def get_post_text(linkedin_soup: bs) -> str:
     containers = linkedin_soup.find_all('div', class_='relative')
     post_texts = []
+    if len(containers) == 0:
+        return []
     # ember859 > div > div.feed-shared-update-v2__description-wrapper > div > div
+    exception_count = 0
     for container in containers:
-        try:
-            # posted_date = container.find('span', {'class': 'visually-hidden'})
-            text_box = container.find('div', attrs={'class':
-                                                    'update-components-text relative feed-shared-update-v2__commentary',
-                                                    'dir':'ltr'})
-            text = text_box.find('span', attrs={'dir': 'ltr'})
-
-            # Appending date and text to lists
-            if text != 'None' :
-                no_span = text[16:-7]
-                post_texts.append(no_span)
-        except Exception:
-            pass
+        text_box = container.find('div', attrs={'class':
+                                                'update-components-text relative feed-shared-update-v2__commentary',
+                                                'dir': 'ltr'})
+        if text_box is None:
+            exception_count += 1
+            continue
+        text = text_box.find('span', attrs={'dir': 'ltr'}).text
+        if text is not None and text != '':
+            post_texts.append(text)
+    print(f'There are {len(containers)} containers and {len(post_texts)} posts are found with {exception_count} exceptions')
     return post_texts
 
 
@@ -99,6 +98,9 @@ if __name__ == '__main__':
     browser = get_chrome_driver()
     login_to_linkedin(browser, username, password)
     for index, row in csv_file_content.iterrows():
+        if pd.isna(row['linkedin_url']):
+            print(f'No linkedin url for {row["person_name"]}')
+            continue
         url = row['linkedin_url'] + '/detail/recent-activity/shares/'
         browser.get(url)
         scroll_to_the_bottom(browser)
@@ -109,13 +111,13 @@ if __name__ == '__main__':
                   'w', encoding='utf-8') as file:
             file.write(str(linkedin_soup))
         post_texts = get_post_text(linkedin_soup)
-        if len(post_texts) <= 10:
-            print(f'Not enough posts for {row["person_name"]} ', post_texts)
-        write_to_csv_file(pd.DataFrame(post_texts), 
+        if len(post_texts) == 0:
+            print(f'{row["person_name"]} is not found throught the url', 
+                  post_texts)
+            continue
+        write_to_csv_file(pd.DataFrame(post_texts),
                           ''.join(row['person_name'].split(' ')) + '.csv')
         print(f'Finished scraping {row["person_name"]}')
-        # print(post_texts)
-        # print('output'+data_exp[0])
         
 
 
