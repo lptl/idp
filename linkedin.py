@@ -103,8 +103,7 @@ def get_post_text(linkedin_soup: bs) -> str:
         if text is not None and text != '':
             post_texts.append(text)
     print(
-        f'There are {len(containers)} containers and {len(post_texts)} \
-            posts are found with {exception_count} exceptions')
+        f'There are {len(containers)} containers and {len(post_texts)} posts are found with {exception_count} exceptions')
     return post_texts
 
 
@@ -123,12 +122,14 @@ if __name__ == '__main__':
     browser = get_chrome_driver()
     login_to_linkedin(browser, username, password)
     for index, row in csv_file_content.iterrows():
-        if index <= 286:
+        if row['person_name'] != 'Kavita Bala':
             continue
         if pd.isna(row['linkedin_url']):
             print(f'No linkedin url for {row["person_name"]}')
             continue
-        linkedin_usrname = row['linkedin_url'].split('/')[-1]
+        linkein_url_parameters = row['linkedin_url'].split('/')
+        linkedin_usrname = linkein_url_parameters[-1] if \
+            linkein_url_parameters[-1] != '' else linkein_url_parameters[-2]
         url = 'http://www.linkedin.com/in/' + linkedin_usrname + \
             '/detail/recent-activity/shares/'
         browser.get(url)
@@ -141,9 +142,20 @@ if __name__ == '__main__':
             file.write(str(linkedin_soup))
         post_texts = get_post_text(linkedin_soup)
         if len(post_texts) == 0:
-            print(f'{row["person_name"]} is not found throught the url',
-                  post_texts)
-            continue
+            alternative_url = 'http://www.linkedin.com/in/' + linkedin_usrname + \
+                '/detail/recent-activity/all/'
+            browser.get(alternative_url)
+            scroll_to_the_bottom(browser)
+            person_page = browser.page_source
+            linkedin_soup = bs(person_page, 'lxml')
+            linkedin_soup.prettify('utf-8')
+            with open(''.join(row['person_name'].split(' ')) + '.html',
+                      'w', encoding='utf-8') as file:
+                file.write(str(linkedin_soup))
+            post_texts = get_post_text(linkedin_soup)
+            if len(post_texts) == 0:
+                print(f'No posts found for {row["person_name"]}')
+                continue
         write_to_csv_file(pd.DataFrame(post_texts),
                           ''.join(row['person_name'].split(' ')) + '.csv')
         print(f'Finished scraping {row["person_name"]} index: {index}')
