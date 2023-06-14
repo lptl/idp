@@ -36,7 +36,7 @@ def get_chrome_driver() -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
     options.binary_location = '/Applications/Chromium.app/Contents/MacOS/Chromium'
     chrome_driver_binary = '/usr/local/bin/chromedriver'
-    browser = webdriver.Chrome(chrome_driver_binary, options=options)
+    browser = webdriver.Chrome()
     return browser
 
 
@@ -121,7 +121,10 @@ if __name__ == '__main__':
     username, password = get_credentials()
     browser = get_chrome_driver()
     login_to_linkedin(browser, username, password)
+    broken_links = []
     for index, row in csv_file_content.iterrows():
+        if (4200 < index or index < 4000):
+            continue
         if row['person_name'] != 'Kavita Bala':
             continue
         if pd.isna(row['linkedin_url']):
@@ -155,7 +158,13 @@ if __name__ == '__main__':
             post_texts = get_post_text(linkedin_soup)
             if len(post_texts) == 0:
                 print(f'No posts found for {row["person_name"]}')
+                broken_links.append(linkedin_usrname)
                 continue
         write_to_csv_file(pd.DataFrame(post_texts),
                           ''.join(row['person_name'].split(' ')) + '.csv')
+
         print(f'Finished scraping {row["person_name"]} index: {index}')
+    saved_broken = open('broken_linkedin.txt', 'w')
+    for username in broken_links:
+        file.write(username+"\n")
+    saved_broken.close()
