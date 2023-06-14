@@ -1,3 +1,4 @@
+import sys
 import os
 import pandas as pd
 
@@ -20,6 +21,9 @@ if __name__ == '__main__':
 
     # set the minimum wnumber of ords one csv file should contain
     minimum_words_number = None
+    if minimum_words_number is None:
+        print('A minimum words number is required. If no restriction exists, set it to 0.')
+        sys.exit(1)
 
     for index, row in names.iterrows():
         name = row['person_name']
