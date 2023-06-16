@@ -114,6 +114,10 @@ if __name__ == '__main__':
         print(f'Scraping {twitter_user_name}')
         tweets = get_user_tweets_without_retweets(twitter_user_name, 1000)
         texts = get_tweet_text(tweets, [20, 2000])
+        if len(texts) == 0:
+            print(f"Skipping {row['person_name']}'s twitter \
+                    as there is no tweet")
+            continue
         write_to_csv_file(pd.DataFrame(texts), ''.join(
             row['person_name'].split(' ')) + '.csv')
         print(f'Finished scraping {row["person_name"]} index {index}')

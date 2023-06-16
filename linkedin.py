@@ -36,7 +36,8 @@ def get_chrome_driver() -> webdriver.Chrome:
     options = webdriver.ChromeOptions()
     options.binary_location = '/Applications/Chromium.app/Contents/MacOS/Chromium'
     chrome_driver_binary = '/usr/local/bin/chromedriver'
-    browser = webdriver.Chrome()
+    browser = webdriver.Chrome(
+        chrome_options=options, executable_path=chrome_driver_binary)
     return browser
 
 
@@ -123,9 +124,7 @@ if __name__ == '__main__':
     login_to_linkedin(browser, username, password)
     broken_links = []
     for index, row in csv_file_content.iterrows():
-        if (4200 < index or index < 4000):
-            continue
-        if row['person_name'] != 'Kavita Bala':
+        if index < 3576:
             continue
         if pd.isna(row['linkedin_url']):
             print(f'No linkedin url for {row["person_name"]}')
