@@ -49,6 +49,15 @@ def main():
                 txt_file.write(new_content)
                 txt_file.write('\n')
             words_count += len(new_content.split())
+        if words_count < max_words_number:
+            words_count = 0
+            txt_file = open(txt_file_name, 'w', encoding='utf-8')
+            for _, row in data.iterrows():
+                new_content = process_text(row['text'])
+                if words_count < max_words_number:
+                    txt_file.write(new_content)
+                    txt_file.write('\n')
+                words_count += len(new_content.split())
         txt_file.close()
 
 
