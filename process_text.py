@@ -1,5 +1,6 @@
 import os
 import re
+import random
 import pandas as pd
 
 
@@ -20,6 +21,9 @@ def process_text(text: str) -> str:
     text = text.replace('\n', '')
     text = text.replace('\r', '')
     text = text.replace('\t', '')
+    text = text.replace('&amp;', '')
+    text = text.replace('&lt;', '')
+    text = text.replace('w/', '')
     text = remove_urls(text)
     text = remove_mentions(text)
     return text
@@ -29,15 +33,22 @@ def main():
     '''main function'''
     data_directory = '/Users/k/Desktop/Courses/idp/4000/result-350/'
     txt_directory = '/Users/k/Desktop/Courses/idp/4000/txt/'
+    max_words_number = 500
     for csv_file_name in os.listdir(data_directory):
+        words_count = 0
         person_name = csv_file_name.split('.')[0]
         csv_path = data_directory + csv_file_name
         data = pd.read_csv(csv_path)
         txt_file_name = txt_directory + person_name + '.txt'
         txt_file = open(txt_file_name, 'w', encoding='utf-8')
         for _, row in data.iterrows():
-            txt_file.write(process_text(row['text']))
-            txt_file.write('\n')
+            if random.random() > 0.5:  # add random skip
+                continue
+            new_content = process_text(row['text'])
+            if words_count < max_words_number:
+                txt_file.write(new_content)
+                txt_file.write('\n')
+            words_count += len(new_content.split())
         txt_file.close()
 
 
