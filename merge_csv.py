@@ -38,7 +38,7 @@ if __name__ == '__main__':
     result_csv_dir = '/Users/k/Desktop/Courses/idp/4000/result-350/'
 
     # set the minimum wnumber of ords one csv file should contain
-    minimum_words_number = 250
+    minimum_words_number = 350
     if minimum_words_number is None:
         print('A minimum words number is required. If no restriction exists, set it to 0.')
         sys.exit(1)

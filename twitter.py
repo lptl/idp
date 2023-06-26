@@ -94,14 +94,14 @@ def read_csv_file(filename: str, filter_columns: List[str]) -> pd.DataFrame:
 
 def write_to_csv_file(data_frame: pd.DataFrame, filename: str) -> None:
     '''write data frame to csv file'''
-    data_frame.to_csv(filename, index=False)
+    data_frame.to_csv('../twitter_csv/' + filename, index=False)
 
 
 if __name__ == '__main__':
     csv_file_name = '../founders_dataset_IDP.csv'
     filter_columns = ['legal_name', 'domain', 'person_name',
                       'gender', 'facebook_url', 'linkedin_url', 'twitter_url']
-    starting_index = 253
+    starting_index = 3455
     data_frame = read_csv_file(csv_file_name, filter_columns)
     for index, row in data_frame.iterrows():
         if index < starting_index:

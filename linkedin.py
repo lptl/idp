@@ -110,7 +110,7 @@ def get_post_text(linkedin_soup: bs) -> str:
 
 def write_to_csv_file(data: pd.DataFrame, filename: str):
     '''write the data to csv file'''
-    data.to_csv(filename, index=False)
+    data.to_csv('../linkedin_csv/' + filename, index=False)
 
 
 if __name__ == '__main__':
