@@ -4,6 +4,7 @@ import pandas as pd
 
 
 def get_words_number(data_frame: pd.DataFrame) -> int:
+    '''get the number of words in a data frame'''
     words_number = 0
     data_frame.rename(columns={'0': 'text'}, inplace=True)
     for _, row in data_frame.iterrows():
@@ -13,22 +14,25 @@ def get_words_number(data_frame: pd.DataFrame) -> int:
 
 
 def read_csv_file(csv_path):
+    '''read a csv file and return a data frame'''
     if not os.path.exists(csv_path) or os.path.getsize(csv_path) == 0:
-        print('File not valid: {}'.format(csv_path))
+        print(f'File not valid: {csv_path}')
         sys.exit(1)
     try:
         data = pd.read_csv(csv_path)
-    except Exception as e:
-        print(f'Exception: {csv_path} is not valid: {e}')
+    except Exception as exception:
+        print(f'Exception: {csv_path} is not valid: {exception}')
         data = pd.DataFrame(columns=['0'])
     return data
 
 
 def process_linkedin(linkedin_frame):
+    '''process linkedin data frame'''
     return linkedin_frame.iloc[::2]
 
 
-if __name__ == '__main__':
+def main():
+    '''main function'''
     csv_file_name = '/Users/k/Desktop/Courses/idp/founders_dataset_IDP.csv'
     filter_columns = ['person_name']
     names = pd.read_csv(csv_file_name, usecols=filter_columns)
@@ -68,3 +72,7 @@ if __name__ == '__main__':
                 linkedin_data.to_csv(result_csv_file, index=False)
         else:
             continue
+
+
+if __name__ == '__main__':
+    main()

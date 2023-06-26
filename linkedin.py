@@ -72,8 +72,7 @@ def scroll_to_the_bottom(browser: webdriver.Chrome):
         'return window.screen.height;')   # get the screen height of the web
     i = 1
     while True:
-        browser.execute_script('window.scrollTo(0, {screen_height}*{i});'.
-                               format(screen_height=screen_height, i=i))
+        browser.execute_script(f'window.scrollTo(0, {screen_height}*{i});')
         i += 1
         # Wait to load page
         time.sleep(SCROLL_PAUSE_TIME)
@@ -113,9 +112,9 @@ def write_to_csv_file(data: pd.DataFrame, filename: str):
     data.to_csv('../linkedin_csv/' + filename, index=False)
 
 
-if __name__ == '__main__':
+def main():
+    '''main function'''
     csv_file_path = '/Users/k/Desktop/Courses/idp/founders_dataset_IDP.csv'
-    SCROLL_PAUSE_TIME = 0.5
 
     csv_file_content = pd.read_csv(csv_file_path, usecols=['person_name',
                                                            'linkedin_url'])
@@ -163,7 +162,12 @@ if __name__ == '__main__':
                           ''.join(row['person_name'].split(' ')) + '.csv')
 
         print(f'Finished scraping {row["person_name"]} index: {index}')
-    saved_broken = open('broken_linkedin.txt', 'w')
+    saved_broken = open('broken_linkedin.txt', 'w', encoding='utf-8')
     for username in broken_links:
         file.write(username+"\n")
     saved_broken.close()
+
+
+if __name__ == '__main__':
+    SCROLL_PAUSE_TIME = 0.5
+    main()

@@ -84,7 +84,7 @@ def get_user(username: str):
 def read_csv_file(filename: str, filter_columns: List[str]) -> pd.DataFrame:
     '''read csv file and filter columns'''
     if not os.path.exists(filename):
-        print('File not found: {}'.format(filename))
+        print(f'File not found: {filename}')
         sys.exit(1)
     raw_data = pd.read_csv(filename)
     filtered_data = raw_data[filter_columns] if filter_columns is not None \
@@ -97,7 +97,8 @@ def write_to_csv_file(data_frame: pd.DataFrame, filename: str) -> None:
     data_frame.to_csv('../twitter_csv/' + filename, index=False)
 
 
-if __name__ == '__main__':
+def main():
+    '''main function'''
     csv_file_name = '../founders_dataset_IDP.csv'
     filter_columns = ['legal_name', 'domain', 'person_name',
                       'gender', 'facebook_url', 'linkedin_url', 'twitter_url']
@@ -121,3 +122,7 @@ if __name__ == '__main__':
         write_to_csv_file(pd.DataFrame(texts), ''.join(
             row['person_name'].split(' ')) + '.csv')
         print(f'Finished scraping {row["person_name"]} index {index}')
+
+
+if __name__ == '__main__':
+    main()
