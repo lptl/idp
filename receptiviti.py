@@ -29,8 +29,9 @@ def main():
     '''main function'''
     data_directory = '/Users/k/Desktop/Courses/idp/4000/txt/'
     json_directory = '/Users/k/Desktop/Courses/idp/4000/json/'
-    max_users_number = 1
+    max_users_number = 500  # run 0-1000
     txt_file_directory = glob.glob(data_directory + '*.txt')
+    # print(list(itertools.islice(txt_file_directory, 0, None)))
     for txt_file_name in itertools.islice(txt_file_directory, 0,
                                           max_users_number):
         txt_file = open(txt_file_name, 'r', encoding='utf-8')
@@ -42,7 +43,7 @@ def main():
         json_file.write(personality_score)
         txt_file.close()
         json_file.close()
-        break  # Add break for testing
+        # break  # Add break for testing
 
 
 if __name__ == '__main__':

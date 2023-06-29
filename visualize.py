@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
@@ -110,7 +111,47 @@ def word_cloud() -> None:
     # plt.show()
 
 
+def words_number_scatter_txt() -> None:
+    '''Plot the distribution of words number in the csv files'''
+    folder_path = '/Users/k/Desktop/Courses/idp/4000/txt/'
+    words_number_list = []
+    for txt_file in os.listdir(folder_path):
+        txt_file_path = folder_path + txt_file
+        with open(txt_file_path, 'r', encoding='utf-8') as f:
+            words_number_list.append(len(f.read().split(' ')))
+    x = range(len(words_number_list))
+    fig, ax = plt.subplots()
+    ax.scatter(x, words_number_list, alpha=0.5)
+    ax.grid()
+    ax.set(xlabel='index', ylabel='words number',
+           title='Words number scatter plot')
+    fig.savefig("figures/words_number_scatter.png")
+    # plt.show()
+
+
+def personality_analysis() -> None:
+    '''initial analysis of the personality result'''
+    json_directory = '/Users/k/Desktop/Courses/idp/4000/json/'
+    category = 'personality'
+    item_key = 'trusting'
+    score_list = []
+    for json_file_path in os.listdir(json_directory):
+        json_file = open(json_directory + json_file_path,
+                         'r', encoding='utf-8')
+        content = json.load(json_file)
+        score_list.append(content['results'][0][category][item_key])
+    x = range(len(score_list))
+    fig, ax = plt.subplots()
+    ax.scatter(x, score_list, alpha=0.5)
+    ax.grid()
+    ax.set(xlabel='index', ylabel='score',
+           title=f'{category} {item_key} - average score: {round(sum(score_list) / len(score_list), 2)}')
+    fig.savefig("figures/personality_score_scatter.png")
+    plt.show()
+
+
 if __name__ == '__main__':
-    # words_number_scatter()
-    words_number_bar()
+    # words_number_scatter_txt()
+    # words_number_bar()
     # word_cloud()
+    personality_analysis()
