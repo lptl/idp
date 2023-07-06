@@ -29,10 +29,12 @@ def main():
     '''main function'''
     data_directory = '/Users/k/Desktop/Courses/idp/4000/txt/'
     json_directory = '/Users/k/Desktop/Courses/idp/4000/json/'
-    max_users_number = 500  # run 0-1000
+    min_start_index = 1000
+    max_users_number = None  # run 0-1000
     txt_file_directory = glob.glob(data_directory + '*.txt')
     # print(list(itertools.islice(txt_file_directory, 0, None)))
-    for txt_file_name in itertools.islice(txt_file_directory, 0,
+    for txt_file_name in itertools.islice(txt_file_directory,
+                                          min_start_index,
                                           max_users_number):
         txt_file = open(txt_file_name, 'r', encoding='utf-8')
         person_name = path_leaf(txt_file_name).split('.')[0]

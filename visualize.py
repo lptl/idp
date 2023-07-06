@@ -132,8 +132,8 @@ def words_number_scatter_txt() -> None:
 def personality_analysis() -> None:
     '''initial analysis of the personality result'''
     json_directory = '/Users/k/Desktop/Courses/idp/4000/json/'
-    category = 'personality'
-    item_key = 'trusting'
+    category = 'drives'
+    item_key = 'power'
     score_list = []
     for json_file_path in os.listdir(json_directory):
         json_file = open(json_directory + json_file_path,
@@ -150,8 +150,35 @@ def personality_analysis() -> None:
     plt.show()
 
 
+def statistics_of_scores_for_big_five() -> None:
+    '''get the average score of big five personality for each type'''
+    json_directory = '/Users/k/Desktop/Courses/idp/4000/json/'
+    category = {'openness': ['artistic', 'adventurous', 'intellectual',
+                             'liberal', 'imaginative', 'emotionally_aware'],
+                'extraversion': ['sociable', 'friendly', 'assertive',
+                                 'active', 'energetic', 'cheerful'],
+                'agreeableness': ['generous', 'trusting', 'cooperative',
+                                  'empathetic', 'genuine', 'humble'],
+                'conscientiousness': ['self_assured', 'organized', 'dutiful',
+                                      'disciplined', 'cautious', 'ambitious'],
+                'neuroticism': ['anxiety_prone', 'stress_prone', 'melancholy',
+                                'self_conscious', 'aggressive', 'impulsive']}
+    for category_key in category.keys():
+        score_list = []
+        for item_key in category[category_key]:
+            for json_file_path in os.listdir(json_directory):
+                json_file = open(json_directory + json_file_path,
+                                 'r', encoding='utf-8')
+                content = json.load(json_file)
+                score_list.append(content['results']
+                                  [0]['personality'][item_key])
+        print(f'{category_key}: {round(sum(score_list) / len(score_list), 2)}')
+
+
 if __name__ == '__main__':
     # words_number_scatter_txt()
     # words_number_bar()
     # word_cloud()
-    personality_analysis()
+    # personality_analysis()
+    # statistics_of_scores_for_each_type()
+    statistics_of_scores_for_big_five()

@@ -1,0 +1,115 @@
+body {
+    background-color: #ffffff;
+    color: #333333;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.42857143;
+    margin: 0;
+}
+
+.div {
+    display: block;
+}
+
+h2 {
+    font-weight: bold;
+    font-size: 18px;
+    color: seagreen;
+    letter-spacing: normal;
+    margin: 0;
+}
+
+button {
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    line-height: 1.42857143;
+    margin-bottom: 20px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    transition-duration: 0.4s;
+    border: none;
+    box-shadow: 0px 0px 3px 3px rgb(230,230,230);
+}
+
+button:hover {
+    color: seagreen;
+    background-color: white;
+    transform: scale(1.05);
+    box-shadow: 13px 13px 100px #969696,
+               -13px -13px 100px #ffffff;
+}
+
+button:active {
+    background-color: seagreen;
+    color: white;
+    box-shadow: 0 0 5px 5px #eeeeee;
+    transform: translateY(4px);
+}
+
+input {
+    border: none;
+    outline: none;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    padding: 1em;
+    background-color: #ccc;
+    box-shadow: inset 2px 5px 10px rgba(0,0,0,0.3);
+    transition: 300ms ease-in-out;
+}
+  
+input:focus {
+    background-color: white;
+    border-color: seagreen;
+    color: seagreen;
+    box-shadow: 13px 13px 100px #969696,
+               -13px -13px 100px #ffffff;
+}
+
+input:hover {
+    background-color: white;
+    color: seagreen;
+    border-color: seagreen;
+    box-shadow: 13px 13px 100px #969696,
+               -13px -13px 100px #ffffff;
+}
+
+custom-tabs-container {
+    width: 85%;
+}
+
+custom-tabs {
+    border-top-left-radius: 3px;
+    background-color: #f9f9f9;
+    padding: 0px 24px;
+    border-bottom: 1px solid #d6d6d6;
+}
+
+custom-tab {
+    color:#586069;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-top: 3px solid transparent !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 0px !important;
+    background-color: #fafbfc;
+    padding: 12px !important;
+    font-family: "system-ui";
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+custom-tab--selected {
+    color: black;
+    box-shadow: 1px 1px 0px white;
+    border-left: 1px solid lightgrey !important;
+    border-right: 1px solid lightgrey !important;
+    border-top: 3px solid #e36209 !important;
+}
