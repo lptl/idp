@@ -1,11 +1,14 @@
 import os
 import json
+import re
 
 import pandas as pd
 import plotly.express as px
 from dash import dcc, callback
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
+
+from geopy.geocoders import Nominatim
 
 
 def get_personality_score(name: str, cate: str) -> float:
@@ -77,10 +80,10 @@ def update_personality_score_founding_graph(score_category: str,
     if founding_item == 'total_funding_usd':
         x_axis = [f'{item * 50}M' for item in x_axis]
     figure = go.Figure(data=go.Bar(x=x_axis, y=y_axis))
-    figure.update_layout(title=f'Personality score vs {founding_item}',
+    figure.update_layout(title=f'{score_category} ~ {founding_item}',
                          xaxis_title=f'{founding_item}',
-                         yaxis_title='Personality score',
-                         font_family='Lucida Sans, sans-serif',
+                         yaxis_title=f'{score_category} score',
+                         font_family='Helvetica, sans-serif',
                          font_size=14,
                          title_font_size=16,
                          legend_title_font_size=14,
@@ -90,7 +93,80 @@ def update_personality_score_founding_graph(score_category: str,
                          marker_line_width=1.5, opacity=0.5,
                          textposition='outside',
                          texttemplate='%{y:.2f}',
-                         textfont=dict(family='Lucida Sans, sans-serif',
+                         textfont=dict(family='Helvetica, sans-serif',
+                                       size=16,
+                                       color='rgb(8,48,107)'))
+    return figure
+
+
+def city_name_to_country(city_name: str) -> str:
+    '''Convert city name to country name.'''
+    geolocator = Nominatim(user_agent='idp')
+    location = geolocator.geocode(city_name)
+    if location is None:
+        return None
+    print(location.address)
+    return location.address.split(',')[-1].strip()
+
+
+@ callback(
+    Output('personality-score-city-status-category-graph', 'figure'),
+    Input('personality-score-category-dropdown-2', 'value'),
+    Input('city-status-category-dropdown', 'value'))
+def update_personality_score_city_status_category_graph(score_category: str,
+                                                        group_item: str) \
+        -> go.Figure:
+    '''Update the personality score city status category graph.'''
+    founders_csv_file = os.environ.get('FOUNDERS_CSV')
+    content = pd.read_csv(founders_csv_file)
+    filter_columns = ['person_name', group_item]
+    content = content[filter_columns]
+    content = content.dropna()
+    if group_item == 'category_groups_list':
+        content[group_item] = content[group_item].apply(
+            lambda x: x.split(',')[0])
+    groups = content.groupby(group_item)
+    x_axis = []
+    y_axis = []
+    for item, group in groups:
+        if group_item == 'city':
+            item = city_name_to_country(item)
+        elif group_item == 'category_groups_list':
+            item = item.split(',')[0]
+        x_axis.append(item)
+        scores = []
+        for _, row in group.iterrows():
+            person_name = row['person_name'].split('.')[0]
+            person_name = ''.join(person_name.split())
+            scores.append(get_personality_score(person_name,
+                                                score_category))
+        scores = [item for item in scores if item is not None]
+        score = round(sum(scores) / len(scores), 2) if scores else 0
+        y_axis.append(score)
+    if group_item == 'employee_count':
+        x_axis[x_axis.index('unknown')] = '-1'
+        x_y_dict = dict(zip(x_axis, y_axis))
+        x_y_dict = {k: v for k, v in sorted(x_y_dict.items(),
+                                            key=lambda item: int(
+                                                re.split('-|\\+', item[0])[0]),
+                                            reverse=True)}
+        x_axis = list(x_y_dict.keys())
+        y_axis = list(x_y_dict.values())
+    figure = go.Figure(data=go.Bar(x=x_axis, y=y_axis))
+    figure.update_layout(title=f'{score_category} ~ {group_item}',
+                         xaxis_title=f'{group_item}',
+                         yaxis_title=f'{score_category} score',
+                         font_family='Helvetica, sans-serif',
+                         font_size=14,
+                         title_font_size=16,
+                         legend_title_font_size=14,
+                         plot_bgcolor='rgb(255,255,255)')
+    figure.update_traces(marker_color='#52BE80',
+                         marker_line_color='rgb(8,48,107)',
+                         marker_line_width=1.5, opacity=0.5,
+                         textposition='outside',
+                         texttemplate='%{y:.2f}',
+                         textfont=dict(family='Helvetica, sans-serif',
                                        size=16,
                                        color='rgb(8,48,107)'))
     return figure
