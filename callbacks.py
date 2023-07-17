@@ -144,12 +144,12 @@ def update_personality_score_city_status_category_graph(score_category: str,
         score = round(sum(scores) / len(scores), 2) if scores else 0
         y_axis.append(score)
     if group_item == 'employee_count':
-        x_axis[x_axis.index('unknown')] = '-1'
+        x_axis[x_axis.index('unknown')] = '0'
         x_y_dict = dict(zip(x_axis, y_axis))
         x_y_dict = {k: v for k, v in sorted(x_y_dict.items(),
                                             key=lambda item: int(
                                                 re.split('-|\\+', item[0])[0]),
-                                            reverse=True)}
+                                            reverse=False)}
         x_axis = list(x_y_dict.keys())
         y_axis = list(x_y_dict.values())
     figure = go.Figure(data=go.Bar(x=x_axis, y=y_axis))

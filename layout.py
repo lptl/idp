@@ -35,7 +35,8 @@ def get_personality_score_founding_part() -> html.Div:
     # items = list(category.keys())
     return html.Div([
         html.H3('Personality score and founding relevance', style={
-            'text-align': 'center', 'margin-bottom': '20px'}),
+            'text-align': 'center', 'margin-bottom': '20px',
+            'font-size': '18px'}),
         html.Div([
             dcc.Dropdown(id='personality-score-category-dropdown',
                          placeholder='Personality category',
@@ -74,7 +75,8 @@ def get_personality_city_status_category_part() -> html.Div:
     items = list(category.keys())
     return html.Div([
         html.H3('Personality score and city/status/category/employee', style={
-            'text-align': 'center', 'margin-bottom': '20px'}),
+            'text-align': 'center', 'margin-bottom': '20px',
+            'font-size': '18px'}),
         html.Div([
             dcc.Dropdown(id='personality-score-category-dropdown-2',
                          placeholder='Personality category',
@@ -87,7 +89,7 @@ def get_personality_city_status_category_part() -> html.Div:
                          options=['city', 'status', 'category_groups_list',
                                   'employee_count'],
                          clearable=False,
-                         value='city',
+                         value='status',
                          style={'width': '50%', 'display': 'inline-block'})],
                  style={'width': '100%', 'display': 'inline-block'}),
         dcc.Graph(id='personality-score-city-status-category-graph',
@@ -104,4 +106,4 @@ def get_layout() -> html.Div:
             get_basic_visualization_tab(),
             get_personality_score_visualization_tab(),
         ], style=TABS_STYLE)
-    ], style={'font-family': 'Helvetica, sans-serif'})
+    ], style={'font-family': 'Geneva, sans-serif'})
