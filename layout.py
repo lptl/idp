@@ -106,4 +106,4 @@ def get_layout() -> html.Div:
             get_basic_visualization_tab(),
             get_personality_score_visualization_tab(),
         ], style=TABS_STYLE)
-    ], style={'font-family': 'Geneva, sans-serif'})
+    ], style={'font-family': 'Libertinus Sans, sans-serif'})
