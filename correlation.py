@@ -94,10 +94,10 @@ def correlation_analysis_categorical_numeric(categorical_column_name: str, numer
     print(f'groups: {len(category_numeric_list)} h-value: {h} p-value: {p}\n')
 
     # Guowen: Alexander Govern test
-    print('Alexander Govern: How to analyze the values of the Alexander Govern test?')
-    result = alexandergovern(*category_numeric_list)
-    print(
-        f'groups: {len(category_numeric_list)} a-value: {result.statistic} p-value: {result.pvalue}\n')
+    # print('Alexander Govern: How to analyze the values of the Alexander Govern test?')
+    # result = alexandergovern(*category_numeric_list)
+    # print(
+    #     f'groups: {len(category_numeric_list)} a-value: {result.statistic} p-value: {result.pvalue}\n')
 
     # Guowen: box plot analysis
     print('Boxplot: If the data are weakly correlated, the boxes will be mostly overlapped with each other.')
@@ -140,13 +140,24 @@ if __name__ == '__main__':
     # The categorical columns include: status, city, employee_count, is_current, title, job_type, gender
     # The numberic columns include: openness, conscientiousness, extraversion, agreeableness, neuroticism
     # We don't consider other numeric columns because we only do personality analysis here
-    # correlation_analysis_categorical_numeric(
-    #     'job_type', 'agreeableness', 'merged_dataframe.csv')
+    categorical_columns = ['status', 'city', 'employee_count',
+                           'is_current', 'title', 'job_type', 'gender']
+    numeric_columns = ['openness', 'conscientiousness',
+                       'extraversion', 'agreeableness', 'neuroticism']
+    for categorical_column in categorical_columns:
+        for numeric_column in numeric_columns:
+            print(
+                f'categorical_column: {categorical_column} numeric_column: {numeric_column}')
+            machine_learning_analysis([categorical_column],
+                                      numeric_column, 'merged_dataframe.csv')
+            # correlation_analysis_categorical_numeric(
+            #     categorical_column, numeric_column, 'merged_dataframe.csv')
+            print('------------------------------------')
     # The initial experiment shows that different personality scores have different correlation with
     # different categorial columns, for example, agreeableness and gender have a strong correlation
 
     # Guowen: This part is to produce the machine learning analysis between feature and target
     # The feature columns include: openness, conscientiousness, extraversion, agreeableness, neuroticism
     # The target columns include: status, city, employee_count, is_current, title, job_type, gender
-    machine_learning_analysis(['gender'],
-                              'openness', 'merged_dataframe.csv')
+    # machine_learning_analysis(['gender'],
+    #                           'openness', 'merged_dataframe.csv')
