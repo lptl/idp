@@ -1,6 +1,8 @@
 import sys
 import os
 import pandas as pd
+import time
+import numpy as np
 
 
 def get_words_number(data_frame: pd.DataFrame) -> int:
