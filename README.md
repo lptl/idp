@@ -4,17 +4,8 @@
 
 Analyze the personality of a person from scraping result of their social media account.
 
-## File Structure
 
-- `linkedin.py`: Scraping LinkedIn profile
-- `twitter.py`: Scraping Twitter profile
-- `facebook.py`: Scraping Facebook profile
-- `merge_csv.py`: Merging all csv files into one. Each scaper stores the scraped file inside a single csv file. This script will merge all csv files into one.
-- `process_text.py`: After merging all csv files, the script process text into txt file format and remove useless words that is not helpful in receptiviti analysis to save expense.
-- `receptiviti.py`: Analyzing the personality of a person from their social media account. This script will read the merged csv file and analyze the personality of the person.
-- `visualize.py`: Visualizing the result of the analysis.
-
-## How to Run:
+## Order of the code:
 
 ### Initial Data Exploration:
 - Open the python notebook file Data_exploration.ipynb on Jupyter Notebook, Google Colab or VS Code.
@@ -29,9 +20,13 @@ Analyze the personality of a person from scraping result of their social media a
 - The scrapping sometimes randomly shuts down due to network issues. As a result please keep track of until which index twitter data has been scrapped.
 - Then rerun the twitter.py by adjusting the value of starting index at line 105.
 
-### LinkedIn Scraping:
+### LinkedIn Scraping: (Fatih pls edit this)
 
-### Reciptiviti API:
+### Processing the text prior to usage of Receptiviti API: (Fatih pls edit this)
+- process_text.py contains necessary fucntions to remove urls, symbols etc processing which must be done before feeding the texts to receptiviti API.
+
+
+### Reciptiviti API: (Fatih pls edit this)
 
 
 ### Combine generated personality scores with founders data:
