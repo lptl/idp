@@ -31,6 +31,9 @@ Analyze the personality of a person from scraping result of their social media a
 
 ### LinkedIn Scraping:
 
+### Reciptiviti API:
+
+
 ### Combine generated personality scores with founders data:
 - Open Combine_dataset.ipynb on Jupyter Notebook, Google Colab or VS Code.
 - Adjust the path to the initial dataset on cell 3.
